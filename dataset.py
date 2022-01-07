@@ -19,7 +19,7 @@ class ChessPiecesDataset(Dataset):
         self.transform = transforms.Compose([transforms.ToTensor(),
                               transforms.Normalize((0.5,), (0.5,)),
                               ])
-    
+                              
     def __len__(self):
         return len(self.chessboard_img_paths)
     
@@ -31,6 +31,10 @@ class ChessPiecesDataset(Dataset):
         gray_scaled_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
         label = FEN_CHARS.index(piece_type)
         return self.transform(gray_scaled_image), label
+
+
+
+
 
 """
 Test the dataset

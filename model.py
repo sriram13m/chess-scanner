@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch.optim import optimizer
 from torch.utils.data import Dataset, DataLoader
 import numpy as np
+from torch.utils.data.sampler import WeightedRandomSampler
 from dataset import ChessPiecesDataset
 from pytorch_lightning.callbacks import ModelCheckpoint
 
@@ -16,7 +17,7 @@ FEN_CHARS = '1RNBQKPrnbqkp'
     
 
 class ChessPiecesClassifier(pl.LightningModule):
-    def __init__(self, learning_rate=1e-3):
+    def __init__(self, learning_rate=1e-2):
         super().__init__()
         self.conv1 = nn.Conv2d(in_channels=1, out_channels=8, kernel_size=(3,3), stride=(1,1), padding=(1,1))
         self.pool = nn.MaxPool2d(kernel_size=(2,2), stride=(2,2))
@@ -24,11 +25,11 @@ class ChessPiecesClassifier(pl.LightningModule):
         self.fc1 = nn.Linear(in_features=16 * 8 * 8, out_features=13)
         self.criterion = nn.CrossEntropyLoss()
         self.learning_rate = learning_rate
-        chess_pieces_dataset = ChessPiecesDataset()
-        train_split = int(0.8 * len(chess_pieces_dataset))
+        self.chess_pieces_dataset = ChessPiecesDataset()
+        train_split = int(0.7 * len(self.chess_pieces_dataset))
         self.val_losses = []
-        test_split = len(chess_pieces_dataset) - train_split
-        self.train_dataset, self.test_dataset = torch.utils.data.random_split(chess_pieces_dataset, [train_split, test_split])
+        test_split = len(self.chess_pieces_dataset) - train_split
+        self.train_dataset, self.test_dataset = torch.utils.data.random_split(self.chess_pieces_dataset, [train_split, test_split])
 
     
     def forward(self, x):
@@ -52,28 +53,45 @@ class ChessPiecesClassifier(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         x,y = batch
         output = self(x)
-        loss = self.criterion(output, y)
-        self.val_losses.append(loss.item())
-        return {'val_loss': loss}
+        #print(output,y)
+        val_loss = self.criterion(output, y)
+        self.val_losses.append(val_loss.item())
+        return {'val_loss': val_loss}
     
     def on_validation_epoch_end(self):
         print("average val loss", sum(self.val_losses) / len(self.val_losses))
         self.val_losses = []
     
     def train_dataloader(self):
-        train_dataloader = DataLoader(self.train_dataset, batch_size=64, shuffle=True)
+        class_weights = []
+        sample_weights = []
+        #self.train_dataset = self.chess_pieces_dataset
+        count = [0]*13
+        for idx, (data, label) in enumerate(self.train_dataset):
+            count[label] += 1
+        
+        for i in range(13):
+            class_weights.append(1/count[i])
+        
+        for idx, (data, label) in enumerate(self.train_dataset):
+            class_weight = class_weights[label]
+            sample_weights.append(class_weight)
+
+        chess_sampler = WeightedRandomSampler(sample_weights, num_samples=len(self.chess_pieces_dataset))
+        train_dataloader = DataLoader(self.train_dataset, batch_size=64, sampler = chess_sampler)
         return train_dataloader
     
     def val_dataloader(self):
-        val_dataloader = DataLoader(self.test_dataset, batch_size=64, shuffle=False)
+        val_dataloader = DataLoader(self.test_dataset, batch_size=64)
         return val_dataloader
 
-    
-"""
-model = ChessPiecesClassifier()
-#print(model(x).shape)
-#print(model(x))
-checkpoint_callback = ModelCheckpoint(monitor="val_loss")
-trainer = pl.Trainer(max_epochs=10, callbacks=[checkpoint_callback])
-trainer.fit(model)
-"""
+
+
+
+if __name__ == '__main__':
+    model = ChessPiecesClassifier()
+    #print(model(x).shape)
+    #print(model(x))
+    #checkpoint_callback = ModelCheckpoint(monitor="val_loss")
+    trainer = pl.Trainer(max_epochs=5)
+    trainer.fit(model)
