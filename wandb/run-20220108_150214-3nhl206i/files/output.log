@@ -1,8 +1,0 @@
-
-torch.Size([64, 1, 32, 32])
-Traceback (most recent call last):
-  File "recogonize.py", line 59, in <module>
-    print(predict_chessboard(IMAGE_PATH))
-  File "recogonize.py", line 45, in predict_chessboard
-    predictions = model(img_data_list).argmax(dim=1)
-TypeError: 'collections.OrderedDict' object is not callable
