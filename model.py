@@ -1,20 +1,58 @@
 import pytorch_lightning as pl
 import torch
-from torch import optim 
 import torch.nn as nn
 import torch.nn.functional as F
-from torch.optim import optimizer
-from torch.utils.data import Dataset, DataLoader
-import numpy as np
+from torch.utils.data import DataLoader
 from torch.utils.data.sampler import WeightedRandomSampler
 from dataset import ChessPiecesDataset
 from pytorch_lightning.callbacks import ModelCheckpoint
+import wandb
+from pytorch_lightning.loggers import WandbLogger
+import torchmetrics
 
 CHESSBOARDS_DIR = './dataset/chessboards'
 TILES_DIR = './dataset/tiles'
 USE_GRAYSCALE = True
 FEN_CHARS = '1RNBQKPrnbqkp'
-    
+
+wandb.init(project="chess_scanner", entity="sriram13")
+
+class ImagePredictionLogger(pl.Callback):
+    def __init__(self, val_samples, num_samples=32):
+        super().__init__()
+        self.val_imgs, self.val_labels = val_samples
+        self.val_imgs = self.val_imgs[:num_samples]
+        self.val_labels = self.val_labels[:num_samples]
+          
+    def on_validation_epoch_end(self, trainer, pl_module):
+        val_imgs = self.val_imgs.to(device=pl_module.device)
+
+        logits = pl_module(val_imgs)
+        preds = torch.argmax(logits, 1)
+
+        trainer.logger.experiment.log({
+            "examples": [wandb.Image(x, caption=f"Pred:{pred}, Label:{y}") 
+                            for x, pred, y in zip(val_imgs, preds, self.val_labels)],
+            "global_step": trainer.global_step
+            })
+
+class ImageTestingLogger(pl.Callback):
+    def __init__(self, val_samples, num_samples=64):
+        super().__init__()
+        self.val_imgs = val_samples
+        self.val_imgs = self.val_imgs[:num_samples]
+          
+    def on_validation_epoch_end(self, trainer, pl_module):
+        val_imgs = self.val_imgs.to(device=pl_module.device)
+
+        logits = pl_module(val_imgs)
+        preds = torch.argmax(logits, 1)
+
+        trainer.logger.experiment.log({
+            "examples": [wandb.Image(x, caption=f"Pred:{pred}") 
+                            for x, pred in zip(val_imgs, preds)],
+            "global_step": trainer.global_step
+            })
 
 class ChessPiecesClassifier(pl.LightningModule):
     def __init__(self, learning_rate=1e-2):
@@ -25,11 +63,18 @@ class ChessPiecesClassifier(pl.LightningModule):
         self.fc1 = nn.Linear(in_features=16 * 8 * 8, out_features=13)
         self.criterion = nn.CrossEntropyLoss()
         self.learning_rate = learning_rate
+
         self.chess_pieces_dataset = ChessPiecesDataset()
-        train_split = int(0.7 * len(self.chess_pieces_dataset))
+        train_split = int(0.82 * len(self.chess_pieces_dataset))
         self.val_losses = []
         test_split = len(self.chess_pieces_dataset) - train_split
         self.train_dataset, self.test_dataset = torch.utils.data.random_split(self.chess_pieces_dataset, [train_split, test_split])
+        
+        self.save_hyperparameters()
+
+        self.train_acc = torchmetrics.Accuracy()
+        self.val_acc = torchmetrics.Accuracy()
+        self.test_acc = torchmetrics.Accuracy()
 
     
     def forward(self, x):
@@ -48,13 +93,18 @@ class ChessPiecesClassifier(pl.LightningModule):
         x,y = batch
         output = self(x)
         loss = self.criterion(output, y)
+        self.log('train/loss', loss, on_epoch=True)
+        self.train_acc(output, y)
+        self.log('train/acc', self.train_acc, on_epoch=True)
         return {'loss': loss}
     
     def validation_step(self, batch, batch_idx):
         x,y = batch
         output = self(x)
-        #print(output,y)
         val_loss = self.criterion(output, y)
+        self.log('train/val_loss', val_loss, on_epoch=True)
+        self.val_acc(output, y)
+        self.log('train/val_acc', self.val_acc, on_epoch=True)
         self.val_losses.append(val_loss.item())
         return {'val_loss': val_loss}
     
@@ -77,11 +127,26 @@ class ChessPiecesClassifier(pl.LightningModule):
             class_weight = class_weights[label]
             sample_weights.append(class_weight)
 
-        chess_sampler = WeightedRandomSampler(sample_weights, num_samples=len(self.chess_pieces_dataset))
+        chess_sampler = WeightedRandomSampler(sample_weights, num_samples=len(self.train_dataset))
         train_dataloader = DataLoader(self.train_dataset, batch_size=64, sampler = chess_sampler)
         return train_dataloader
     
     def val_dataloader(self):
+        class_weights = []
+        sample_weights = []
+        #self.train_dataset = self.chess_pieces_dataset
+        count = [0]*13
+        for idx, (data, label) in enumerate(self.test_dataset):
+            count[label] += 1
+        
+        for i in range(13):
+            class_weights.append(1/count[i])
+        
+        for idx, (data, label) in enumerate(self.test_dataset):
+            class_weight = class_weights[label]
+            sample_weights.append(class_weight)
+
+        chess_sampler = WeightedRandomSampler(sample_weights, num_samples=len(self.test_dataset))
         val_dataloader = DataLoader(self.test_dataset, batch_size=64)
         return val_dataloader
 
@@ -90,8 +155,11 @@ class ChessPiecesClassifier(pl.LightningModule):
 
 if __name__ == '__main__':
     model = ChessPiecesClassifier()
-    #print(model(x).shape)
-    #print(model(x))
-    #checkpoint_callback = ModelCheckpoint(monitor="val_loss")
-    trainer = pl.Trainer(max_epochs=5)
+    #samples = next(iter(model.val_dataloader()))
+    from recogonize import _chessboard_tiles_img_data, IMAGE_PATH
+    samples = _chessboard_tiles_img_data(IMAGE_PATH)
+    wandb_logger = WandbLogger(project="chess_scanner")
+    trainer = pl.Trainer(logger=wandb_logger, max_epochs=10, callbacks=[ImageTestingLogger(samples)])
     trainer.fit(model)
+    torch.save(model.state_dict(), "model.pth")
+

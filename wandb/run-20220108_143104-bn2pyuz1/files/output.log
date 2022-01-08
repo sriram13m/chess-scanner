@@ -1,0 +1,65 @@
+
+Validation sanity check: 0it [00:00, ?it/s]
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/loggers/wandb.py:341: UserWarning: There is a wandb run already in progress and newly created instances of `WandbLogger` will reuse this run. If this is not desired, call `wandb.finish()` before instantiating `WandbLogger`.
+  rank_zero_warn(
+  | Name      | Type             | Params
+-----------------------------------------------
+0 | conv1     | Conv2d           | 80
+1 | pool      | MaxPool2d        | 0
+2 | conv2     | Conv2d           | 1.2 K
+3 | fc1       | Linear           | 13.3 K
+4 | criterion | CrossEntropyLoss | 0
+5 | train_acc | Accuracy         | 0
+6 | val_acc   | Accuracy         | 0
+7 | test_acc  | Accuracy         | 0
+-----------------------------------------------
+14.6 K    Trainable params
+0         Non-trainable params
+14.6 K    Total params
+0.058     Total estimated model params size (MB)
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+
+Validation sanity check:   0%|                                                                                                                                   | 0/2 [00:00<?, ?it/s]average val loss 2.547826886177063
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+
+
+
+
+
+Epoch 0:  99%|████████████████████████████████████████████████████████████████████████████████████████████████████████████▉ | 512/517 [00:12<00:00, 39.75it/s, loss=0.0148, v_num=yuz1]average val loss 0.020974107840228625
+
+
+
+
+
+Epoch 1:  84%|███████████████████████████████████████████████████████████████████████████████████████████                  | 432/517 [00:13<00:02, 32.41it/s, loss=0.00514, v_num=yuz1]
+
+
+
+
+
+
+
+Epoch 2:  98%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉  | 507/517 [00:14<00:00, 34.27it/s, loss=0.00353, v_num=yuz1]average val loss 0.0073180305636963575
+
+
+
+
+
+
+
+Epoch 3:  98%|██████████████████████████████████████████████████████████████████████████████████████████████████████████▉  | 507/517 [00:16<00:00, 31.44it/s, loss=0.00623, v_num=yuz1]average val loss 0.010115327879580574
+
+
+
+
+
+
+
+Epoch 4:  91%|█████████████████████████████████████████████████████████████████████████████████████████████████▊          | 468/517 [00:15<00:01, 29.73it/s, loss=0.000418, v_num=yuz1]
+
+Epoch 4: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████| 517/517 [00:16<00:00, 31.21it/s, loss=0.000418, v_num=yuz1]

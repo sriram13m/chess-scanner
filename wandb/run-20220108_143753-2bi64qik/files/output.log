@@ -1,0 +1,6 @@
+Traceback (most recent call last):
+  File "model.py", line 144, in <module>
+    trainer = pl.Trainer(logger=wandb_logger, max_epochs=5, callbacks=[ImagePredictionLogger(samples)])
+  File "model.py", line 23, in __init__
+    self.val_imgs, self.val_labels = val_samples
+ValueError: too many values to unpack (expected 2)

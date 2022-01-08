@@ -1,0 +1,72 @@
+
+Validation sanity check: 0it [00:00, ?it/s]
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+  | Name      | Type             | Params
+-----------------------------------------------
+0 | conv1     | Conv2d           | 80
+1 | pool      | MaxPool2d        | 0
+2 | conv2     | Conv2d           | 1.2 K
+3 | fc1       | Linear           | 13.3 K
+4 | criterion | CrossEntropyLoss | 0
+5 | train_acc | Accuracy         | 0
+6 | val_acc   | Accuracy         | 0
+7 | test_acc  | Accuracy         | 0
+-----------------------------------------------
+14.6 K    Trainable params
+0         Non-trainable params
+14.6 K    Total params
+
+Validation sanity check:   0%|                                                                                                                                   | 0/2 [00:00<?, ?it/s]average val loss 2.5579657554626465
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+Epoch 0:   1%|▉                                                                                                                    | 4/517 [00:00<00:14, 35.60it/s, loss=2.62, v_num=0]
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+
+
+
+
+
+
+Epoch 0:  92%|███████████████████████████████████████████████████████████████████████████████████████████████████████▎        | 477/517 [00:14<00:01, 33.27it/s, loss=0.00464, v_num=0]
+
+
+
+
+
+
+
+Epoch 1:  98%|█████████████████████████████████████████████████████████████████████████████████████████████████████████████▊  | 507/517 [00:14<00:00, 35.24it/s, loss=0.00568, v_num=0]average val loss 0.011615132356891208
+
+
+
+
+
+
+
+Epoch 2:  97%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████▏  | 504/517 [00:16<00:00, 29.98it/s, loss=0.0104, v_num=0]average val loss 0.01019596714671621
+
+
+
+
+
+
+
+Epoch 3:  92%|███████████████████████████████████████████████████████████████████████████████████████████████████████         | 476/517 [00:16<00:01, 29.49it/s, loss=0.00453, v_num=0]
+
+
+
+
+
+
+
+
+Epoch 4:  82%|███████████████████████████████████████████████████████████████████████████████████████████▊                    | 424/517 [00:17<00:03, 24.75it/s, loss=0.00712, v_num=0]
+Epoch 4: 100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 517/517 [00:18<00:00, 27.75it/s, loss=0.00712, v_num=0]
+torch.Size([64, 1, 32, 32])
+tensor([ 0,  0,  7,  0,  0,  0, 11,  0,  0,  0,  0, 10,  0, 12,  9, 12, 12,  0,
+         0, 12,  0,  0, 12,  0,  0, 12,  0,  6, 12,  0,  0,  8,  0,  6,  7,  0,
+         6,  0,  0,  0,  6,  0,  0,  4,  3,  6,  0,  6,  0,  0,  0,  0,  2,  0,
+         6,  0,  0,  0,  1,  0,  0,  1,  5,  0])
+2r3k1/3q1pbp/p2p2p1/1p1Pp2n/1Pr1P3/P2QBP1P/4N1P1/2R2RK1

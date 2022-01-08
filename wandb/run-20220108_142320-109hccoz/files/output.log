@@ -1,0 +1,109 @@
+
+Validation sanity check: 0it [00:00, ?it/s]
+GPU available: False, used: False
+TPU available: False, using: 0 TPU cores
+IPU available: False, using: 0 IPUs
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/loggers/wandb.py:341: UserWarning: There is a wandb run already in progress and newly created instances of `WandbLogger` will reuse this run. If this is not desired, call `wandb.finish()` before instantiating `WandbLogger`.
+  rank_zero_warn(
+  | Name      | Type             | Params
+-----------------------------------------------
+0 | conv1     | Conv2d           | 80
+1 | pool      | MaxPool2d        | 0
+2 | conv2     | Conv2d           | 1.2 K
+3 | fc1       | Linear           | 13.3 K
+4 | criterion | CrossEntropyLoss | 0
+5 | train_acc | Accuracy         | 0
+6 | val_acc   | Accuracy         | 0
+7 | test_acc  | Accuracy         | 0
+-----------------------------------------------
+14.6 K    Trainable params
+0         Non-trainable params
+14.6 K    Total params
+0.058     Total estimated model params size (MB)
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, val_dataloader 0, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+
+Validation sanity check:   0%|                                                                                                                                   | 0/2 [00:00<?, ?it/s]average val loss 2.5771374702453613
+/Users/fevenz/miniforge3/envs/chess_scanner/lib/python3.8/site-packages/pytorch_lightning/trainer/data_loading.py:116: UserWarning: The dataloader, train_dataloader, does not have many workers which may be a bottleneck. Consider increasing the value of the `num_workers` argument` (try 8 which is the number of cpus on this machine) in the `DataLoader` init to improve performance.
+  rank_zero_warn(
+
+
+
+
+
+Epoch 0:  87%|██████████████████████████████████████████████████████████████████████████████████████████████▊              | 450/517 [00:13<00:02, 32.37it/s, loss=0.00989, v_num=ccoz]
+
+
+
+
+
+
+
+
+Epoch 1:  99%|████████████████████████████████████████████████████████████████████████████████████████████████████████████▎| 514/517 [00:15<00:00, 32.67it/s, loss=0.00275, v_num=ccoz]average val loss 0.014507341819817842
+
+
+
+
+
+
+Epoch 2:  85%|████████████████████████████████████████████████████████████████████████████████████████████▎               | 442/517 [00:15<00:02, 29.37it/s, loss=0.000642, v_num=ccoz]
+
+
+
+
+
+
+
+Epoch 3:  98%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▉  | 507/517 [00:15<00:00, 33.21it/s, loss=0.000229, v_num=ccoz]average val loss 0.011514367467390657
+
+
+
+
+
+
+
+Epoch 4:  98%|█████████████████████████████████████████████████████████████████████████████████████████████████████████▉  | 507/517 [00:14<00:00, 33.82it/s, loss=0.000666, v_num=ccoz]average val loss 0.009805771024251151
+
+
+
+
+
+
+Epoch 5:  93%|████████████████████████████████████████████████████████████████████████████████████████████████████▍       | 481/517 [00:15<00:01, 31.71it/s, loss=0.000329, v_num=ccoz]
+
+
+
+
+
+
+
+Epoch 6:  85%|█████████████████████████████████████████████████████████████████████████████████████████████▏               | 442/517 [00:15<00:02, 28.85it/s, loss=0.00914, v_num=ccoz]
+
+
+
+
+
+
+
+
+Epoch 7:  85%|█████████████████████████████████████████████████████████████████████████████████████████████▏               | 442/517 [00:17<00:02, 25.77it/s, loss=1.9e-05, v_num=ccoz]
+
+
+
+
+
+
+
+
+Epoch 8:  85%|████████████████████████████████████████████████████████████████████████████████████████████▎               | 442/517 [00:16<00:02, 27.05it/s, loss=6.36e-06, v_num=ccoz]
+
+
+
+
+
+
+
+
+Epoch 9:  98%|███████████████████████████████████████████████████████████████████████████████████████████████████████████▊  | 507/517 [00:17<00:00, 29.68it/s, loss=0.0011, v_num=ccoz]
+
+Epoch 9: 100%|██████████████████████████████████████████████████████████████████████████████████████████████████████████████| 517/517 [00:17<00:00, 29.94it/s, loss=0.0011, v_num=ccoz]

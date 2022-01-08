@@ -3,11 +3,12 @@ from generate_tiles import USE_GRAYSCALE, get_chessboard_tiles
 import numpy as np
 from glob import glob
 import torch
+import pytorch_lightning as pl
 from torchvision import transforms
 
-NN_MODEL_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/.checkpoints/model2.ckpt'
+NN_MODEL_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/.checkpoints/model.pth'
 FEN_CHARS = '1RNBQKPrnbqkp'
-IMAGE_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/test_images/test.png'
+IMAGE_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/test_images/classic.png'
 USE_GRAYSCALE = True
 
 def _chessboard_tiles_img_data(chessboard_img_path, options={}):
@@ -54,5 +55,6 @@ def predict_chessboard(chessboard_img_path):
 
 
 if __name__ == '__main__':
-    model = ChessPiecesClassifier.load_from_checkpoint(NN_MODEL_PATH)
+    model = ChessPiecesClassifier()
+    model.load_state_dict(torch.load(NN_MODEL_PATH))
     print(predict_chessboard(IMAGE_PATH))
