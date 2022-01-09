@@ -1,12 +1,22 @@
+import os
+import sys
+import inspect
+
+currentdir = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+parentdir = os.path.dirname(currentdir)
+sys.path.insert(0, parentdir)
+
 from model import ChessPiecesClassifier
 from generate_tiles import get_chessboard_tiles
 import numpy as np
 import torch
+from glob import glob
 from torchvision import transforms
+import time
 
 NN_MODEL_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/model/model.pth"
 FEN_CHARS = "1RNBQKPrnbqkp"
-IMAGE_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/tests/support/chessbase.png"
+IMAGE_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/tests/support/"
 
 
 def _chessboard_tiles_img_data(chessboard_img_path):
@@ -48,9 +58,21 @@ def predict_chessboard(chessboard_img_path, model):
     )
     return predicted_fen
 
-
-if __name__ == "__main__":
+def test_chess_scanner():
+    support_file_names = glob("{}/*.png".format(IMAGE_PATH))
+    start_time = time.time()
     model = ChessPiecesClassifier()
     model.load_state_dict(torch.load(NN_MODEL_PATH))
     scripted_model = model.to_torchscript(method="script", file_path=None)
-    print(predict_chessboard(IMAGE_PATH, scripted_model))
+    end_time = time.time()
+    print(f"Time taken to initialize ChessPiecesClassifier: {round(end_time - start_time, 2)}s")
+    predictions = list()
+    output = ["R2KQB1R/1B1N1P2/PP1PP1PP/2P5/4pp2/2npbn2/ppp1b1pp/1kr1q2r","1nR5/5kpp/r7/q6r/6Q1/4B3/PP3PPb/3R3k","2R1Q2R/PP2KPPP/2P1PN2/3Pn3/pp1p4/2nqp3/5ppp/r1r2k2","4R2R/KBP3P1/1P1B3P/PnPp4/p3p1b1/5n2/1pp3pp/1kr1r3"]
+    for chessboard_image_path in support_file_names:
+        predictions.append(predict_chessboard(chessboard_image_path, scripted_model))
+    assert predictions == output
+    return predictions
+
+
+if __name__ == "__main__":
+    print(test_chess_scanner())
