@@ -14,9 +14,9 @@ from glob import glob
 from torchvision import transforms
 import time
 
-NN_MODEL_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/model/model.pth"
+NN_MODEL_PATH = "../artifacts/model.pth"
 FEN_CHARS = "1RNBQKPrnbqkp"
-IMAGE_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/tests/support/"
+IMAGE_PATH = "../tests/support/"
 
 
 def _chessboard_tiles_img_data(chessboard_img_path):

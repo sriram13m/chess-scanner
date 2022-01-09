@@ -4,9 +4,9 @@ import numpy as np
 import torch
 from torchvision import transforms
 
-NN_MODEL_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/model/model.pth"
+NN_MODEL_PATH = "artifacts/model.pth"
 FEN_CHARS = "1RNBQKPrnbqkp"
-IMAGE_PATH = "/Users/fevenz/Sriram/Projects/chess-scanner/tests/support/chessbase.png"
+IMAGE_PATH = "tests/support/chessbase.png"
 
 
 def _chessboard_tiles_img_data(chessboard_img_path):
