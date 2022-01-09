@@ -1,29 +1,22 @@
 from model import ChessPiecesClassifier
-from generate_tiles import USE_GRAYSCALE, get_chessboard_tiles
+from generate_tiles import get_chessboard_tiles
 import numpy as np
-from glob import glob
 import torch
-import pytorch_lightning as pl
 from torchvision import transforms
 
-NN_MODEL_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/.checkpoints/model.pth'
+NN_MODEL_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/model/model.pth'
 FEN_CHARS = '1RNBQKPrnbqkp'
 IMAGE_PATH = '/Users/fevenz/Sriram/Projects/chess-scanner/test_images/classic.png'
-USE_GRAYSCALE = True
 
-def _chessboard_tiles_img_data(chessboard_img_path, options={}):
+def _chessboard_tiles_img_data(chessboard_img_path):
     """ Given a file path to a chessboard PNG image, returns a
         size-64 array of 32x32 tiles representing each square of a chessboard
     """
-    n_channels = 1 if USE_GRAYSCALE else 3
-    tiles = get_chessboard_tiles(chessboard_img_path, use_grayscale=USE_GRAYSCALE)
+    tiles = get_chessboard_tiles(chessboard_img_path)
     img_data_list = []
     for i in range(64):
         transform = transforms.Compose([transforms.ToTensor(), transforms.Grayscale(num_output_channels=1)])
         img_data = transform(tiles[i])
-        #img_data.unsqueeze_(0)
-        #tiles[i].show()
-        #print(img_data.shape)
         img_data_list.append(img_data)
     return torch.stack(img_data_list)
 
@@ -41,10 +34,8 @@ def predict_chessboard(chessboard_img_path):
         Returns a FEN string representation of the chessboard
     """
     img_data_list = _chessboard_tiles_img_data(chessboard_img_path)
-    print(img_data_list.shape)
     predictions = model(img_data_list).argmax(dim=1)
     fen_predictions = [FEN_CHARS[prediction] for prediction in predictions]
-    print(predictions)
 
     predicted_fen = compressed_fen(
         '/'.join(

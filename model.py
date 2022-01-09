@@ -5,14 +5,12 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 from torch.utils.data.sampler import WeightedRandomSampler
 from dataset import ChessPiecesDataset
-from pytorch_lightning.callbacks import ModelCheckpoint
 import wandb
 from pytorch_lightning.loggers import WandbLogger
 import torchmetrics
 
 CHESSBOARDS_DIR = './dataset/chessboards'
 TILES_DIR = './dataset/tiles'
-USE_GRAYSCALE = True
 FEN_CHARS = '1RNBQKPrnbqkp'
 
 wandb.init(project="chess_scanner", entity="sriram13")
@@ -65,7 +63,7 @@ class ChessPiecesClassifier(pl.LightningModule):
         self.learning_rate = learning_rate
 
         self.chess_pieces_dataset = ChessPiecesDataset()
-        train_split = int(0.82 * len(self.chess_pieces_dataset))
+        train_split = int(0.8 * len(self.chess_pieces_dataset))
         self.val_losses = []
         test_split = len(self.chess_pieces_dataset) - train_split
         self.train_dataset, self.test_dataset = torch.utils.data.random_split(self.chess_pieces_dataset, [train_split, test_split])
@@ -115,7 +113,6 @@ class ChessPiecesClassifier(pl.LightningModule):
     def train_dataloader(self):
         class_weights = []
         sample_weights = []
-        #self.train_dataset = self.chess_pieces_dataset
         count = [0]*13
         for idx, (data, label) in enumerate(self.train_dataset):
             count[label] += 1
@@ -134,7 +131,6 @@ class ChessPiecesClassifier(pl.LightningModule):
     def val_dataloader(self):
         class_weights = []
         sample_weights = []
-        #self.train_dataset = self.chess_pieces_dataset
         count = [0]*13
         for idx, (data, label) in enumerate(self.test_dataset):
             count[label] += 1
@@ -155,11 +151,9 @@ class ChessPiecesClassifier(pl.LightningModule):
 
 if __name__ == '__main__':
     model = ChessPiecesClassifier()
-    #samples = next(iter(model.val_dataloader()))
-    from recogonize import _chessboard_tiles_img_data, IMAGE_PATH
-    samples = _chessboard_tiles_img_data(IMAGE_PATH)
+    samples = next(iter(model.val_dataloader()))
     wandb_logger = WandbLogger(project="chess_scanner")
-    trainer = pl.Trainer(logger=wandb_logger, max_epochs=10, callbacks=[ImageTestingLogger(samples)])
+    trainer = pl.Trainer(logger=wandb_logger, max_epochs=10, callbacks=[ImagePredictionLogger(samples)])
     trainer.fit(model)
     torch.save(model.state_dict(), "model.pth")
 
