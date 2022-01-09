@@ -77,7 +77,7 @@ toml==0.10.2
 torch==1.10.0
 torch-tb-profiler==0.3.1
 torchmetrics==0.6.2
-torchvision==0.10.0a0
+torchvision==0.10.00
 tornado==6.1
 tqdm==4.62.3
 typing_extensions==4.0.1
