@@ -14,9 +14,6 @@ CHESSBOARDS_DIR = "./dataset/chessboards"
 TILES_DIR = "./dataset/tiles"
 FEN_CHARS = "1RNBQKPrnbqkp"
 
-wandb.init(project="chess_scanner", entity="sriram13")
-
-
 class ImagePredictionLogger(pl.Callback):
     def __init__(self, val_samples, num_samples=32):
         super().__init__()
