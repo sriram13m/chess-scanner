@@ -3,7 +3,7 @@ set +e
 
 FAILURE=false
 
-pytest -s . || FAILURE=true
+python3 -m pytest -s . || FAILURE=true
 
 if [ "$FAILURE" = true ]; then
   echo "Tests failed"
