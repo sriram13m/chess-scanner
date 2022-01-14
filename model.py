@@ -14,6 +14,7 @@ CHESSBOARDS_DIR = "./dataset/chessboards"
 TILES_DIR = "./dataset/tiles"
 FEN_CHARS = "1RNBQKPrnbqkp"
 
+
 class ImagePredictionLogger(pl.Callback):
     def __init__(self, val_samples, num_samples=32):
         super().__init__()
@@ -183,4 +184,5 @@ if __name__ == "__main__":
         logger=wandb_logger, max_epochs=10, callbacks=[ImagePredictionLogger(samples)]
     )
     trainer.fit(model)
-    torch.save(model.state_dict(), "model.pth")
+    scripted_model = model.to_torchscript(method="script", file_path=None)
+    torch.jit.save(scripted_model, "model.pt")

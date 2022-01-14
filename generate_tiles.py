@@ -110,7 +110,7 @@ def generate_tiles_from_all_chessboards():
     for i, chessboard_img_path in enumerate(chessboard_img_filenames):
         print("%3d/%d %s" % (i + 1, num_chessboards, chessboard_img_path))
         img_save_dir = _img_save_dir(chessboard_img_path)
-        if os.path.exists(img_save_dir) and not OVERWRITE:
+        if os.path.exists(img_save_dir):
             print("\tIgnoring existing {}\n".format(img_save_dir))
             num_skipped += 1
             continue
