@@ -1,3 +1,4 @@
+from io import BytesIO
 from model import ChessPiecesClassifier
 import numpy as np
 import torch
@@ -17,8 +18,23 @@ class ChessScanner:
         self.model.load_state_dict(torch.load(NN_MODEL_PATH))
         self.scripted_model = self.model.to_torchscript(method="script", file_path=None)
     
-    def _get_image(self, chessboard_img_path, use_grayscale=True):
+    def _get_resized_chessboard(self, chessboard_img_path):
+        """chessboard_img_path = path to a chessboard image
+        Returns a 256x256 image of a chessboard (32x32 per tile)
+        """
+        img_data = PIL.Image.open(chessboard_img_path).convert("RGB")
+        return img_data.resize([256, 256], PIL.Image.BILINEAR)
+    
+    def _get_image_from_path(self, chessboard_img_path, use_grayscale=True):
         img_data = self._get_resized_chessboard(chessboard_img_path)
+        if use_grayscale:
+            img_data = img_data.convert("L", (0.2989, 0.5870, 0.1140, 0))
+        image = np.asarray(img_data, dtype=np.uint8)
+        return image
+    
+    def _get_image_from_bytes(self, bytes, use_grayscale=True):
+        img_data = PIL.Image.open(BytesIO(bytes)).convert("RGB")
+        img_data = img_data.resize([256, 256], PIL.Image.BILINEAR)
         if use_grayscale:
             img_data = img_data.convert("L", (0.2989, 0.5870, 0.1140, 0))
         image = np.asarray(img_data, dtype=np.uint8)
@@ -64,13 +80,6 @@ class ChessScanner:
             img_data_list.append(img_data)
         return torch.stack(img_data_list)
 
-    def _get_resized_chessboard(self, chessboard_img_path):
-        """chessboard_img_path = path to a chessboard image
-        Returns a 256x256 image of a chessboard (32x32 per tile)
-        """
-        img_data = PIL.Image.open(chessboard_img_path).convert("RGB")
-        return img_data.resize([256, 256], PIL.Image.BILINEAR)
-
     def _get_chessboard_tiles(self, image, use_grayscale=True):
         """chessboard_img_path = path to a chessboard image
         use_grayscale = true/false for whether to return tiles in grayscale
@@ -100,9 +109,13 @@ class ChessScanner:
 
     def predict(self, image):
         return self._predict_chessboard(image)
+    
+    def predict_bytes(self, image_bytes):
+        image = self._get_image_from_bytes(image_bytes)
+        return self.predict(image)
 
     def predict_image_path(self, image_path):
-        image = self._get_image(image_path)
+        image = self._get_image_from_path(image_path)
         return self.predict(image)
 
 
